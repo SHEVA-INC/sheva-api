@@ -1,3 +1,9 @@
-from django.shortcuts import render
+from rest_framework import viewsets
 
-# Create your views here.
+from boots.models import Boots
+from boots.serializers import BootsSerializer
+
+
+class BootsViewSet(viewsets.ModelViewSet):
+    queryset = Boots.objects.all()
+    serializer_class = BootsSerializer

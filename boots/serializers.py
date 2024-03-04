@@ -1,10 +1,10 @@
 from rest_framework import serializers
-from boots.models import Product
+from boots.models import Boots
 
 
-class ProductSerializer(serializers.ModelSerializer):
+class BootsSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Product
+        model = Boots
         fields = (
             "id",
             "name",
