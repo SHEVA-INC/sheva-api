@@ -17,11 +17,9 @@ class BootsSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "name",
-            "description",
             "price",
             "color",
             "size",
-            "stock",
             "brand",
             "images",
             "uploaded_images",
@@ -36,10 +34,21 @@ class BootsSerializer(serializers.ModelSerializer):
         return boots
 
 
-class BootsListSerializer(serializers.ModelSerializer):
+class BootsDetailSerializer(serializers.ModelSerializer):
+    images = BootsImageSerializer(many=True)
 
     class Meta:
         model = Boots
-        fields = ("id", "name", "brand", "color", "size", "price")
+        fields = (
+            "id",
+            "name",
+            "description",
+            "price",
+            "color",
+            "size",
+            "stock",
+            "brand",
+            "images",
+        )
 
 
