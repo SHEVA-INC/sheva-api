@@ -5,7 +5,7 @@ from boots.models import Boots, BootsImage
 class BootsImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = BootsImage
-        fields = ("id", "boots", "image")
+        fields = ("image",)
 
 
 class BootsSerializer(serializers.ModelSerializer):

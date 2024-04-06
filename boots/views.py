@@ -1,4 +1,5 @@
 from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 from boots.models import Boots
 from boots.serializers import BootsSerializer, BootsDetailSerializer,  BootsImageSerializer
@@ -7,6 +8,7 @@ from boots.serializers import BootsSerializer, BootsDetailSerializer,  BootsImag
 class BootsViewSet(viewsets.ModelViewSet):
     queryset = Boots.objects.all()
     serializer_class = BootsSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get_serializer_class(self):
         if self.action == "retrieve":
