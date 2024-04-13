@@ -31,5 +31,5 @@ urlpatterns = [
     path("api/reviews/", include("review.urls", namespace="review")),
     path("api/user/", include("user.urls", namespace="user")),
     path("api/orders/", include("order.urls", namespace="order")),
-
+    path("api/cart/", include("cart.urls", namespace="cart")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

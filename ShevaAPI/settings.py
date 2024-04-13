@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "boots",
     "order",
     "review",
+    "cart",
     "user",
 ]
 
@@ -150,7 +151,10 @@ REST_FRAMEWORK = {
 
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    )
+    ),
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ]
 }
 
 SPECTACULAR_SETTINGS = {

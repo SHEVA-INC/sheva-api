@@ -19,4 +19,4 @@ class Review(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Date Created")
 
     def __str__(self):
-        return f'Review for {self.product.name} by {self.user.username}'
+        return f'Review for {self.boots.name} by {self.user.username}'

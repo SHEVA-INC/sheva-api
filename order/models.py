@@ -1,35 +1,23 @@
 from django.db import models
-
-from ShevaAPI import settings
-from boots.models import Boots
+from cart.models import Cart
 
 
 class Order(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255)
+    surname = models.CharField(max_length=255)
+    middle_name = models.CharField(max_length=255)
+    region = models.CharField(max_length=255)
+    city_town = models.CharField(max_length=255)
+    post_office_number = models.IntegerField()
+    phone_number = models.IntegerField()
+
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    is_paid = models.BooleanField(default=False)
+
+    def total_price(self):
+        return self.cart.total_price()
 
     def __str__(self):
-        return f"Order {self.id} by {self.user.username}"
-
-    def get_total_cost(self):
-        return sum(item.get_cost() for item in self.items.all())
+        return f'Order {self.id} - Cart {self.cart.id}'
 
 
-class OrderItem(models.Model):
-    order = models.ForeignKey(Order, related_name='items', on_delete=models.CASCADE)
-    boots = models.ForeignKey(Boots, on_delete=models.CASCADE)
-    price = models.DecimalField(max_digits=10, decimal_places=2)
-    quantity = models.PositiveIntegerField(default=1)
-
-    def __str__(self):
-        return str(self.id)
-
-    def get_cost(self):
-        return self.price * self.quantity
-
-    def save(self, *args, **kwargs):
-        if not self.pk:  # Якщо елемент замовлення новий
-            self.price = self.product.price  # Встановлення ціни з продукту
-        super().save(*args, **kwargs)

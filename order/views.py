@@ -1,12 +1,5 @@
-from rest_framework import generics, permissions
-from .models import Order
-from .serializers import OrderSerializer
+from rest_framework import generics
+from .models import Region, City, Warehouse
+from .serializers import RegionSerializer, CitySerializer, WarehouseSerializer
 
 
-class CreateOrderView(generics.CreateAPIView):
-    queryset = Order.objects.all()
-    serializer_class = OrderSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
