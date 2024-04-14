@@ -6,7 +6,8 @@ from boots.models import Boots
 
 class Cart(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    products = models.ManyToManyField(Boots, through='CartProduct')
+    products = models.ManyToManyField(Boots, related_name="boots",
+                                      through='CartProduct')
     created_at = models.DateTimeField(auto_now_add=True)
 
     def total_price(self):
@@ -16,7 +17,16 @@ class Cart(models.Model):
         return total
 
     def __str__(self):
-        return f'Cart {self.id} - User: {self.user.username}'
+        products_details = []
+        for cart_product in self.cartproduct_set.all():
+            product = cart_product.product
+            products_details.append(
+                f"{product.name} - {product.brand} (Розмір: {product.size})\n"
+                f"Кількість: {cart_product.quantity}\n"
+                f"Ціна за од.: ({product.price}₴)\n"
+                f"------------------------------------\n")
+
+        return f' Products: \n{"".join(products_details)}\n'
 
 
 class CartProduct(models.Model):

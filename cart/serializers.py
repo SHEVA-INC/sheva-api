@@ -9,12 +9,15 @@ class CartProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CartProduct
-        fields = ('id', 'cart', 'product', 'quantity')
+        fields = ['id', 'quantity', 'product']
 
 
 class CartSerializer(serializers.ModelSerializer):
-    products = CartProductSerializer(many=True, read_only=True)
+    cartproduct_set = CartProductSerializer(many=True, read_only=True)
 
     class Meta:
         model = Cart
-        fields = ('id', 'user', 'products', 'total_price', 'created_at')
+        fields = ['cartproduct_set', 'total_price']
+
+    def get_total_price(self, cart):
+        return cart.total_price()
