@@ -28,6 +28,12 @@ class Boots(models.Model):
         ('another', 'Another'),
     ]
 
+    BRAND_CHOICES = [
+        ('adidas', 'Adidas'),
+        ('nike', 'Nike'),
+        ('puma', 'Puma'),
+    ]
+
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
@@ -37,7 +43,9 @@ class Boots(models.Model):
         MaxValueValidator(45)
     ], help_text='Choose a size between 35 and 45')
     stock = models.PositiveIntegerField()
-    brand = models.CharField(max_length=100)
+    brand = models.CharField(max_length=100, choices=BRAND_CHOICES)
+    new = models.BooleanField(default=True)
+    popular = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name

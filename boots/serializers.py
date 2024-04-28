@@ -52,3 +52,9 @@ class BootsDetailSerializer(serializers.ModelSerializer):
         )
 
 
+class NewPopularBootsSerializer(serializers.ModelSerializer):
+    images = BootsImageSerializer(many=True)
+
+    class Meta:
+        model = Boots
+        fields = ("id", "name", "brand", "price", "images")

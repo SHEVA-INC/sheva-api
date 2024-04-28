@@ -1,7 +1,10 @@
-from django.contrib.auth import get_user_model, authenticate
+from django.contrib.auth import get_user_model, authenticate, password_validation
 from rest_framework import serializers, exceptions
 
 from django.utils.translation import gettext as _
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+
+from user.models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -23,6 +26,8 @@ class UserSerializer(serializers.ModelSerializer):
             user.save()
 
         return user
+
+
 #
 #
 # class AuthTokenSerializer(serializers.Serializer):
@@ -49,3 +54,26 @@ class UserSerializer(serializers.ModelSerializer):
 #
 #         data["user"] = user
 #         return data
+
+
+class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+
+        token['role'] = "admin" if user.is_staff else "user"
+
+        return token
+
+
+class ChangePasswordSerializer(serializers.Serializer):
+    model = User
+
+    """
+    Serializer for password change endpoint.
+    """
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)
+
+
+
