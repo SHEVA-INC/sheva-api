@@ -8,9 +8,9 @@ router.register("", BootsViewSet)
 
 
 urlpatterns = [
-    path("list/", include(router.urls)),
-    path('new/', NewBootsList.as_view(), name='new-boots'),
-    path('popular/', PopularBootsList.as_view(), name='popular-boots'),
+    path("list", include(router.urls)),
+    path('new', NewBootsList.as_view(), name='new-boots'),
+    path('popular', PopularBootsList.as_view(), name='popular-boots'),
 ]
 
 app_name = "boots"
