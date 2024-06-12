@@ -33,6 +33,7 @@ class CartProduct(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
     product = models.ForeignKey(Boots, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
+    size = models.PositiveIntegerField()
 
     def subtotal(self):
         return self.quantity * self.product.price

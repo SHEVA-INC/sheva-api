@@ -1,15 +1,15 @@
 from rest_framework import serializers
 
-from boots.serializers import BootsSerializer
+from boots.serializers import BootsSerializer, BootsCartSerializer
 from .models import Cart, CartProduct
 
 
 class CartProductSerializer(serializers.ModelSerializer):
-    product = BootsSerializer()
+    product = BootsCartSerializer()
 
     class Meta:
         model = CartProduct
-        fields = ['id', 'quantity', 'product']
+        fields = ['cart', 'product', 'size', 'quantity', 'subtotal']
 
 
 class CartSerializer(serializers.ModelSerializer):

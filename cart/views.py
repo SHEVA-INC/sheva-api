@@ -3,7 +3,8 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from boots.models import Boots
+from boots.models import Boots, Size
+from boots.serializers import BootsCartSerializer
 from .models import Cart, CartProduct
 from .serializers import CartSerializer, CartProductSerializer
 
@@ -23,17 +24,24 @@ def get_cart(request):
 
 
 @api_view(['POST'])
-def add_to_cart(request, product_id):
-    cart, created = Cart.objects.get_or_create(user=request.user)
+@permission_classes([IsAuthenticated])
+def add_to_cart(request, product_id, quantity, size):
+    user = request.user
+
+    if quantity < 1:
+        return Response({"message": "Quantity must be at least 1"}, status=status.HTTP_400_BAD_REQUEST)
+
+    cart, created = Cart.objects.get_or_create(user=user)
 
     try:
-        product = Boots.objects.get(id=product_id)
-    except Boots.DoesNotExist:
-        return Response({"message": "Product not found"}, status=status.HTTP_404_NOT_FOUND)
+        product_size = Size.objects.get(boots_id=product_id, size=size)
+        product = product_size.boots
+    except Size.DoesNotExist:
+        return Response({"message": "Product with this size not found"}, status=status.HTTP_404_NOT_FOUND)
 
-    if CartProduct.objects.filter(cart=cart, product=product).exists():
+    if CartProduct.objects.filter(cart=cart, product=product, size=size).exists():
         return Response({"message": "Product already in cart"}, status=status.HTTP_400_BAD_REQUEST)
 
-    cart_product = CartProduct.objects.create(cart=cart, product=product)
+    cart_product = CartProduct.objects.create(cart=cart, product=product, size=size, quantity=quantity)
     serializer = CartProductSerializer(cart_product)
     return Response(serializer.data, status=status.HTTP_201_CREATED)
