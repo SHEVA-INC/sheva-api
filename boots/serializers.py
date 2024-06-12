@@ -1,10 +1,12 @@
 from rest_framework import serializers
 from boots.models import Boots, BootsImage, Size
 
+
 class SizeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Size
-        fields = ('size', 'stock')
+        fields = ('size',)
+
 
 class BootsImageSerializer(serializers.ModelSerializer):
     class Meta:
@@ -66,3 +68,13 @@ class NewPopularBootsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Boots
         fields = ("id", "name", "brand", "price", "images")
+
+
+class BootsCartSerializer(serializers.ModelSerializer):
+    uploaded_images = serializers.ListField(
+        child=serializers.ImageField(max_length=1000000, allow_empty_file=False, use_url=False),
+        write_only=True)
+
+    class Meta:
+        model = Boots
+        fields = ("name", "brand", "price", "color", "main_image", "uploaded_images")

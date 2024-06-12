@@ -46,6 +46,7 @@ class Boots(models.Model):
     def __str__(self):
         return self.name
 
+
 class Size(models.Model):
     boots = models.ForeignKey(Boots, related_name='sizes', on_delete=models.CASCADE)
     size = models.PositiveIntegerField(validators=[
