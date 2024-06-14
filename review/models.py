@@ -6,10 +6,9 @@ from boots.models import Boots
 
 
 class Review(models.Model):
-    boots = models.ForeignKey(Boots, on_delete=models.CASCADE, related_name='reviews')
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     text = models.TextField(verbose_name="Review Text")
-    rating = models.IntegerField(
+    rating = models.FloatField(
         verbose_name="Rating",
         validators=[
             MinValueValidator(1),

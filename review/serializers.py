@@ -6,13 +6,11 @@ User = get_user_model()
 
 
 class ReviewSerializer(serializers.ModelSerializer):
-    boots_name = serializers.CharField(source='boots.name', read_only=True)
-    boots = serializers.PrimaryKeyRelatedField(queryset=Boots.objects.all(), write_only=True)
     username = serializers.CharField(source='user.username', read_only=True)
 
     class Meta:
         model = Review
-        fields = ['id', 'boots', 'boots_name', 'username', 'text', 'rating', 'created_at']
+        fields = ['id', 'username', 'text', 'rating', 'created_at']
         read_only_fields = ['user', 'created_at']
 
     def create(self, validated_data):
