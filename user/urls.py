@@ -13,8 +13,8 @@ urlpatterns = [
     path("token/refresh", TokenRefreshView.as_view(), name="token_refresh"),
     path("token/verify", TokenVerifyView.as_view(), name="token_verify"),
     path("change_password", views.ChangePasswordView.as_view(), name="change_password"),
-    path('api/profile/', UserProfileView.as_view(), name='get_profile'),
-    path('api/profile/update/', UserProfileUpdateView.as_view(), name='update_profile'),
+    path('api/profile', UserProfileView.as_view(), name='get_profile'),
+    path('api/profile/update', UserProfileUpdateView.as_view(), name='update_profile'),
 ]
 
 app_name = "user"
