@@ -8,10 +8,11 @@ User = get_user_model()
 class ReviewSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source='user.username', read_only=True)
     profile_picture = serializers.ImageField(source='user.profile_picture', read_only=True)
+    user_id = serializers.IntegerField(source='user.id', read_only=True)
 
     class Meta:
         model = Review
-        fields = ['id', 'username', 'profile_picture', 'text', 'rating', 'created_at']
+        fields = ['id', 'user_id', 'username', 'profile_picture', 'text', 'rating', 'created_at']
         read_only_fields = ['user', 'created_at']
 
     def create(self, validated_data):
