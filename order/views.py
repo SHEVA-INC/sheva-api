@@ -7,6 +7,8 @@ from .tg_bot import send_telegram_message
 
 
 class OrderCreateAPIView(APIView):
+    serializer_class = OrderSerializer
+
     def post(self, request):
         serializer = OrderSerializer(data=request.data)
         if serializer.is_valid():

@@ -1,11 +1,14 @@
-from rest_framework import routers
-from .views import ReviewViewSet
+from django.urls import path
+from django.conf.urls.static import static
 
-router = routers.DefaultRouter()
+from ShevaAPI import settings
+from .views import ReviewListView, ReviewCreateView, ReviewDeleteView
 
-router.register("", ReviewViewSet)
+urlpatterns = [
+    path('list/', ReviewListView.as_view(), name='review-list'),
+    path('reviews/create', ReviewCreateView.as_view(), name='review-create'),
+    path('reviews/delete/<int:pk>', ReviewDeleteView.as_view(), name='review-delete'),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
-
-urlpatterns = router.urls
 
 app_name = "review"
