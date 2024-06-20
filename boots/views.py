@@ -1,37 +1,97 @@
-from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework import viewsets, status, generics
+from rest_framework.decorators import api_view
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django_filters.rest_framework import DjangoFilterBackend
 
+from boots.filters import BootsFilter
 from boots.models import Boots
+from boots.permissions import IsAdminOrReadOnly
 from boots.serializers import BootsSerializer, BootsDetailSerializer, BootsImageSerializer, \
-    NewPopularBootsSerializer
+    NewPopularBootsSerializer, LikedBootsSerializer, IdsSerializer, BootsImageUpdateSerializer, \
+    MainImageUpdateSerializer, BootsUpdateSerializer
 
 
 class BootsViewSet(viewsets.ModelViewSet):
     queryset = Boots.objects.all()
     serializer_class = BootsSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAdminOrReadOnly]
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = BootsFilter
 
     def get_serializer_class(self):
         if self.action == "retrieve":
             return BootsDetailSerializer
-
         return BootsSerializer
 
 
 class NewBootsList(APIView):
     permission_classes = [IsAuthenticatedOrReadOnly]
+    serializer_class = NewPopularBootsSerializer
 
     def get(self, request):
         boots = Boots.objects.filter(new=True)
-        serializer = NewPopularBootsSerializer(boots, many=True)
+        serializer = NewPopularBootsSerializer(boots, many=True, context={'request': request})
         return Response(serializer.data)
+
 
 class PopularBootsList(APIView):
     permission_classes = [IsAuthenticatedOrReadOnly]
+    serializer_class = NewPopularBootsSerializer
 
     def get(self, request):
         boots = Boots.objects.filter(popular=True)
-        serializer = NewPopularBootsSerializer(boots, many=True)
+        serializer = NewPopularBootsSerializer(boots, many=True, context={'request': request})
         return Response(serializer.data)
+
+
+class GetBootsByIdsView(APIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = IdsSerializer
+
+    def post(self, request):
+        serializer = IdsSerializer(data=request.data)
+        if serializer.is_valid():
+            ids = serializer.validated_data['ids']
+            boots = Boots.objects.filter(id__in=ids)
+            boots_serializer = LikedBootsSerializer(boots, many=True, context={'request': request})
+            return Response(boots_serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class BootsUpdateView(generics.UpdateAPIView):
+    queryset = Boots.objects.all()
+    serializer_class = BootsUpdateSerializer
+    permission_classes = [IsAdminOrReadOnly]
+
+    def get_object(self):
+        return Boots.objects.get(id=self.kwargs['pk'])
+
+
+class MainImageUpdateView(generics.UpdateAPIView):
+    queryset = Boots.objects.all()
+    serializer_class = MainImageUpdateSerializer
+    permission_classes = [IsAdminOrReadOnly]
+
+    def get_object(self):
+        return Boots.objects.get(id=self.kwargs['pk'])
+
+
+class BootsImagesUpdateView(generics.GenericAPIView):
+    queryset = Boots.objects.all()
+    serializer_class = BootsImageUpdateSerializer
+    permission_classes = [IsAdminOrReadOnly]
+
+    def get_object(self):
+        return Boots.objects.get(id=self.kwargs['pk'])
+
+    def put(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def perform_update(self, serializer):
+        serializer.save()
