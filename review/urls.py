@@ -6,8 +6,8 @@ from .views import ReviewListView, ReviewCreateView, ReviewDeleteView
 
 urlpatterns = [
     path('list/', ReviewListView.as_view(), name='review-list'),
-    path('reviews/create', ReviewCreateView.as_view(), name='review-create'),
-    path('reviews/delete/<int:pk>', ReviewDeleteView.as_view(), name='review-delete'),
+    path('create', ReviewCreateView.as_view(), name='review-create'),
+    path('delete/<int:pk>', ReviewDeleteView.as_view(), name='review-delete'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 

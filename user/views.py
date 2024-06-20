@@ -10,7 +10,7 @@ from rest_framework.generics import UpdateAPIView
 
 from user.models import User
 from user.serializers import UserSerializer, MyTokenObtainPairSerializer, ChangePasswordSerializer, \
-    UserProfileSerializer
+    UserProfileSerializer, UserProfilePictureUpdateSerializer
 
 
 class CreateUserView(generics.CreateAPIView):
@@ -95,4 +95,22 @@ class UserProfileUpdateView(generics.UpdateAPIView):
         self.perform_update(serializer)
 
         return Response({"detail": "User profile was updated successfully"},
+                        status=status.HTTP_200_OK)
+
+
+class UserProfilePictureUpdateView(generics.UpdateAPIView):
+    serializer_class = UserProfilePictureUpdateSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        return Response({"detail": "Profile picture was updated successfully"},
                         status=status.HTTP_200_OK)

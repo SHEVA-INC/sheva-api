@@ -7,7 +7,8 @@ from rest_framework_simplejwt.views import (
 )
 
 from user import views
-from user.views import CreateUserView, UserProfileView, UserProfileUpdateView
+from user.views import CreateUserView, UserProfileView, UserProfileUpdateView, \
+    UserProfilePictureUpdateView
 
 urlpatterns = [
     path("register", CreateUserView.as_view(), name="create"),
@@ -17,6 +18,7 @@ urlpatterns = [
     path("change_password", views.ChangePasswordView.as_view(), name="change_password"),
     path('profile/', UserProfileView.as_view(), name='get_profile'),
     path('profile/update', UserProfileUpdateView.as_view(), name='update_profile'),
+    path('profile/update-picture', UserProfilePictureUpdateView.as_view(), name='profile_picture_update')
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 app_name = "user"
