@@ -180,10 +180,13 @@ class MainImageUpdateSerializer(serializers.ModelSerializer):
 
 
 class BootsImageUpdateSerializer(serializers.Serializer):
-    images = BootsImageSerializer(many=True)
+    images = serializers.ListField(
+        child=serializers.ImageField(),
+        write_only=True
+    )
 
     def update(self, instance, validated_data):
-        images_data = validated_data.get('images')
+        images_data = validated_data.pop('images', [])
         for image_data in images_data:
-            BootsImage.objects.create(boots=instance, **image_data)
+            BootsImage.objects.create(boots=instance, image=image_data)
         return instance
