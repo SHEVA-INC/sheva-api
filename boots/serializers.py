@@ -142,9 +142,35 @@ class IdsSerializer(serializers.Serializer):
 
 
 class BootsUpdateSerializer(serializers.ModelSerializer):
+    sizes = SizeSerializer(many=True, required=False)
+
     class Meta:
         model = Boots
-        fields = ("name", "description", "price", "color", "brand", "type", "new", "popular")
+        fields = ("name", "description", "price", "color", "brand", "type", "new", "popular", "sizes")
+
+    def update(self, instance, validated_data):
+        sizes_data = validated_data.pop('sizes', [])
+        instance.name = validated_data.get('name', instance.name)
+        instance.description = validated_data.get('description', instance.description)
+        instance.price = validated_data.get('price', instance.price)
+        instance.color = validated_data.get('color', instance.color)
+        instance.brand = validated_data.get('brand', instance.brand)
+        instance.type = validated_data.get('type', instance.type)
+        instance.new = validated_data.get('new', instance.new)
+        instance.popular = validated_data.get('popular', instance.popular)
+        instance.save()
+
+        for size_data in sizes_data:
+            size_id = size_data.get('id')
+            if size_id:
+                size = Size.objects.get(id=size_id, boots=instance)
+                size.size = size_data.get('size', size.size)
+                size.stock = size_data.get('stock', size.stock)
+                size.save()
+            else:
+                Size.objects.create(boots=instance, **size_data)
+
+        return instance
 
 
 class MainImageUpdateSerializer(serializers.ModelSerializer):
