@@ -1,3 +1,5 @@
+from django.core.files.storage import default_storage
+from django.db import transaction
 from rest_framework import viewsets, status, generics
 from rest_framework.decorators import api_view
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
@@ -90,7 +92,16 @@ class BootsImagesUpdateView(generics.GenericAPIView):
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data)
         serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
+
+        with transaction.atomic():
+            # Delete old images
+            for old_image in instance.images.all():
+                default_storage.delete(old_image.image.path)
+                old_image.delete()
+
+            # Save new images
+            self.perform_update(serializer)
+
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def perform_update(self, serializer):
