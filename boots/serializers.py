@@ -146,10 +146,12 @@ class BootsUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Boots
-        fields = ("name", "description", "price", "color", "brand", "type", "new", "popular", "sizes")
+        fields = (
+        "name", "description", "price", "color", "brand", "type", "new", "popular", "sizes")
 
     def update(self, instance, validated_data):
         sizes_data = validated_data.pop('sizes', [])
+
         instance.name = validated_data.get('name', instance.name)
         instance.description = validated_data.get('description', instance.description)
         instance.price = validated_data.get('price', instance.price)
@@ -160,15 +162,10 @@ class BootsUpdateSerializer(serializers.ModelSerializer):
         instance.popular = validated_data.get('popular', instance.popular)
         instance.save()
 
+        instance.sizes.all().delete()
+
         for size_data in sizes_data:
-            size_id = size_data.get('id')
-            if size_id:
-                size = Size.objects.get(id=size_id, boots=instance)
-                size.size = size_data.get('size', size.size)
-                size.stock = size_data.get('stock', size.stock)
-                size.save()
-            else:
-                Size.objects.create(boots=instance, **size_data)
+            Size.objects.create(boots=instance, **size_data)
 
         return instance
 
@@ -192,20 +189,22 @@ class MainImageUpdateSerializer(serializers.ModelSerializer):
 #         return instance
 
 
-class BootsImageUpdateSerializer(serializers.Serializer):
+class BootsImageUpdateSerializer(serializers.ModelSerializer):
     uploaded_images = serializers.ListField(
-        child=serializers.FileField(max_length=1000000, allow_empty_file=False, use_url=False),
+        child=serializers.ImageField(max_length=1000000, allow_empty_file=False, use_url=True),
         write_only=True
     )
 
-    def update(self, instance, validated_data):
-        uploaded_images = validated_data.pop('uploaded_images', [])
+    class Meta:
+        model = Boots
+        fields = ("uploaded_images",)
 
-        # Видалення старих зображень
+    def update(self, instance, validated_data):
+        uploaded_images = validated_data.pop('uploaded_images')
+
         for old_image in instance.images.all():
             old_image.delete()
 
-        # Додавання нових зображень
         for image_data in uploaded_images:
             BootsImage.objects.create(boots=instance, image=image_data)
 
