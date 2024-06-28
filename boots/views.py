@@ -80,7 +80,7 @@ class MainImageUpdateView(generics.UpdateAPIView):
         return Boots.objects.get(id=self.kwargs['pk'])
 
 
-class BootsImagesUpdateView(generics.GenericAPIView):
+class BootsImagesUpdateView(generics.UpdateAPIView):
     queryset = Boots.objects.all()
     serializer_class = BootsImageUpdateSerializer
     permission_classes = [IsAdminOrReadOnly]
@@ -88,15 +88,15 @@ class BootsImagesUpdateView(generics.GenericAPIView):
     def get_object(self):
         return Boots.objects.get(id=self.kwargs['pk'])
 
-    def put(self, request, *args, **kwargs):
-        instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        with transaction.atomic():
-            self.perform_update(serializer)
-
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    def perform_update(self, serializer):
-        serializer.save()
+    # def post(self, request, *args, **kwargs):
+    #     instance = self.get_object()
+    #     serializer = self.get_serializer(instance, data=request.data)
+    #     serializer.is_valid(raise_exception=True)
+    #
+    #     with transaction.atomic():
+    #         self.perform_update(serializer)
+    #
+    #     return Response(serializer.data, status=status.HTTP_200_OK)
+    #
+    # def perform_update(self, serializer):
+    #     serializer.save()
