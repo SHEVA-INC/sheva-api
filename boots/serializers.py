@@ -179,14 +179,36 @@ class MainImageUpdateSerializer(serializers.ModelSerializer):
         fields = ("main_image",)
 
 
+# class BootsImageUpdateSerializer(serializers.Serializer):
+#     images = serializers.ListField(
+#         child=serializers.ImageField(),
+#         write_only=True
+#     )
+#
+#     def update(self, instance, validated_data):
+#         images_data = validated_data.pop('images', [])
+#         for image_data in images_data:
+#             BootsImage.objects.create(boots=instance, image=image_data)
+#         return instance
+
+
 class BootsImageUpdateSerializer(serializers.Serializer):
-    images = serializers.ListField(
-        child=serializers.ImageField(),
+    uploaded_images = serializers.ListField(
+        child=serializers.FileField(max_length=1000000, allow_empty_file=False, use_url=False),
         write_only=True
     )
 
     def update(self, instance, validated_data):
-        images_data = validated_data.pop('images', [])
-        for image_data in images_data:
+        uploaded_images = validated_data.pop('uploaded_images', [])
+
+        # Видалення старих зображень
+        for old_image in instance.images.all():
+            old_image.delete()
+
+        # Додавання нових зображень
+        for image_data in uploaded_images:
             BootsImage.objects.create(boots=instance, image=image_data)
+
         return instance
+
+

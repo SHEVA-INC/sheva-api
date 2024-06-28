@@ -94,12 +94,6 @@ class BootsImagesUpdateView(generics.GenericAPIView):
         serializer.is_valid(raise_exception=True)
 
         with transaction.atomic():
-            # Delete old images
-            for old_image in instance.images.all():
-                default_storage.delete(old_image.image.path)
-                old_image.delete()
-
-            # Save new images
             self.perform_update(serializer)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
