@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django_filters.rest_framework import DjangoFilterBackend
 
-from boots.filters import BootsFilter
+from boots.filters import BootsFilter, CustomPageNumberPagination
 from boots.models import Boots
 from boots.permissions import IsAdminOrReadOnly
 from boots.serializers import BootsSerializer, BootsDetailSerializer, BootsImageSerializer, \
@@ -16,11 +16,12 @@ from boots.serializers import BootsSerializer, BootsDetailSerializer, BootsImage
 
 
 class BootsViewSet(viewsets.ModelViewSet):
-    queryset = Boots.objects.all()
+    queryset = Boots.objects.all().order_by('id')
     serializer_class = BootsSerializer
     permission_classes = [IsAdminOrReadOnly]
     filter_backends = [DjangoFilterBackend]
     filterset_class = BootsFilter
+    pagination_class = CustomPageNumberPagination
 
     def get_serializer_class(self):
         if self.action == "retrieve":

@@ -141,8 +141,8 @@ REST_FRAMEWORK = {
         'rest_framework.throttling.AnonRateThrottle',
         'rest_framework.throttling.UserRateThrottle'
     ],
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 5,
+    'DEFAULT_PAGINATION_CLASS': 'boots.filters.CustomPageNumberPagination',
+    'PAGE_SIZE': 1,
     'DEFAULT_THROTTLE_RATES': {
         'anon': '150/day',
         'user': '1000/day'
