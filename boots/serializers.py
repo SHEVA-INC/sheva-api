@@ -126,13 +126,13 @@ class BootsCartSerializer(serializers.ModelSerializer):
 class LikedBootsSerializer(serializers.ModelSerializer):
     uploaded_images = BootsImageSerializer(source='images', many=True)
     sizes = SizeSerializer(many=True)
-    main_image_url = serializers.SerializerMethodField()
+    main_image = serializers.SerializerMethodField()
 
     class Meta:
         model = Boots
-        fields = ("id", "name", "brand", "price", "main_image_url", "color", "uploaded_images", "sizes")
+        fields = ("id", "name", "type", "brand", "price", "main_image", "color", "uploaded_images", "sizes")
 
-    def get_main_image_url(self, obj):
+    def get_main_image(self, obj):
         request = self.context.get('request')
         return build_absolute_uri(request, obj.main_image.url)
 
