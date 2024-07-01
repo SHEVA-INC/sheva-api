@@ -8,7 +8,7 @@ from review.serializers import ReviewSerializer
 
 
 class ReviewListView(generics.ListAPIView):
-    queryset = Review.objects.all()
+    queryset = Review.objects.all().order_by('id')
     serializer_class = ReviewSerializer
     permission_classes = [AllowAny]
 
