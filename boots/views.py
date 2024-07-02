@@ -50,14 +50,23 @@ class PopularBootsList(APIView):
 
 
 class GetBootsByIdsView(APIView):
+    queryset = Boots.objects.all().order_by('id')
     permission_classes = [IsAuthenticated]
     serializer_class = IdsSerializer
+    pagination_class = CustomPageNumberPagination
 
     def post(self, request):
         serializer = IdsSerializer(data=request.data)
         if serializer.is_valid():
             ids = serializer.validated_data['ids']
             boots = Boots.objects.filter(id__in=ids)
+
+            paginator = CustomPageNumberPagination()
+            page = paginator.paginate_queryset(boots, request)
+            if page is not None:
+                boots_serializer = LikedBootsSerializer(page, many=True, context={'request': request})
+                return paginator.get_paginated_response(boots_serializer.data)
+
             boots_serializer = LikedBootsSerializer(boots, many=True, context={'request': request})
             return Response(boots_serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

@@ -3,6 +3,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from boots.filters import CustomPageNumberPagination
 from boots.models import Boots, Size
 from boots.serializers import BootsCartSerializer
 from .models import Cart, CartProduct
@@ -19,7 +20,15 @@ def get_cart(request):
     except Cart.DoesNotExist:
         return Response({'error': 'Cart not found'}, status=status.HTTP_404_NOT_FOUND)
 
-    serializer = CartSerializer(cart)
+    cart_products = cart.cartproduct_set.all()
+
+    paginator = CustomPageNumberPagination()
+    page = paginator.paginate_queryset(cart_products, request)
+    if page is not None:
+        serializer = CartProductSerializer(page, many=True, context={'request': request})
+        return paginator.get_paginated_response(serializer.data)
+
+    serializer = CartProductSerializer(cart_products, many=True, context={'request': request})
     return Response(serializer.data)
 
 
