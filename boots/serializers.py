@@ -114,14 +114,20 @@ class NewPopularBootsSerializer(serializers.ModelSerializer):
 
 
 class BootsCartSerializer(serializers.ModelSerializer):
-    uploaded_images = serializers.ListField(
-        child=serializers.ImageField(max_length=1000000, allow_empty_file=False, use_url=False),
-        write_only=True)
+    uploaded_images = BootsImageSerializer(source='images', many=True)
 
     class Meta:
         model = Boots
-        fields = ("name", "brand", "price", "color", "main_image", "uploaded_images")
-
+        fields = (
+            "id",
+            "name",
+            "price",
+            "color",
+            "brand",
+            "uploaded_images",
+            "main_image",
+            "type"
+        )
 
 class LikedBootsSerializer(serializers.ModelSerializer):
     uploaded_images = BootsImageSerializer(source='images', many=True)
@@ -209,5 +215,6 @@ class BootsImageUpdateSerializer(serializers.ModelSerializer):
             BootsImage.objects.create(boots=instance, image=image_data)
 
         return instance
+
 
 

@@ -5,7 +5,6 @@ from rest_framework.response import Response
 
 from boots.filters import CustomPageNumberPagination
 from boots.models import Boots, Size
-from boots.serializers import BootsCartSerializer
 from .models import Cart, CartProduct
 from .serializers import CartSerializer, CartProductSerializer
 
@@ -26,10 +25,20 @@ def get_cart(request):
     page = paginator.paginate_queryset(cart_products, request)
     if page is not None:
         serializer = CartProductSerializer(page, many=True, context={'request': request})
-        return paginator.get_paginated_response(serializer.data)
+        response_data = {
+            'current_page': paginator.page.number,
+            'total_pages': paginator.page.paginator.num_pages,
+            'results': serializer.data
+        }
+        return paginator.get_paginated_response(response_data['results'])
 
     serializer = CartProductSerializer(cart_products, many=True, context={'request': request})
-    return Response(serializer.data)
+    response_data = {
+        'results': serializer.data
+    }
+    return Response(response_data)
+
+
 
 
 @api_view(['POST'])
