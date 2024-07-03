@@ -1,3 +1,5 @@
+import json
+
 from rest_framework import serializers
 from boots.models import Boots, BootsImage, Size
 from urllib.parse import urljoin
@@ -82,7 +84,11 @@ class BootsSerializer(serializers.ModelSerializer):
 
 class BootsDetailSerializer(serializers.ModelSerializer):
     sizes = SizeSerializer(many=True)
-    images = BootsImageSerializer(many=True)
+    images = BootsImageSerializer(many=True, read_only=True)
+    uploaded_images = serializers.ListField(
+        child=serializers.ImageField(use_url=True),
+        write_only=True
+    )
 
     class Meta:
         model = Boots
@@ -95,9 +101,21 @@ class BootsDetailSerializer(serializers.ModelSerializer):
             "sizes",
             "brand",
             "images",
+            "uploaded_images",
             "main_image",
             "type"
         )
+
+    def create(self, validated_data):
+        sizes_data = validated_data.pop('sizes', [])
+        uploaded_images = validated_data.pop('uploaded_images', [])
+        boots = super().create(validated_data)
+        for image in uploaded_images:
+            BootsImage.objects.create(boots=boots, image=image)
+        print(sizes_data)
+        for size_data in sizes_data:
+            Size.objects.create(boots=boots, **size_data)
+        return boots
 
 
 class NewPopularBootsSerializer(serializers.ModelSerializer):
@@ -196,7 +214,7 @@ class MainImageUpdateSerializer(serializers.ModelSerializer):
 
 class BootsImageUpdateSerializer(serializers.ModelSerializer):
     uploaded_images = serializers.ListField(
-        child=serializers.ImageField(max_length=1000000, allow_empty_file=False, use_url=True),
+        child=serializers.ImageField(max_length=1000000, allow_empty_file=True, use_url=True),
         write_only=True
     )
 

@@ -24,9 +24,7 @@ class BootsViewSet(viewsets.ModelViewSet):
     pagination_class = CustomPageNumberPagination
 
     def get_serializer_class(self):
-        if self.action == "retrieve":
-            return BootsDetailSerializer
-        if self.action == "create":
+        if self.action in ["retrieve", "create"]:
             return BootsDetailSerializer
         return BootsSerializer
 
