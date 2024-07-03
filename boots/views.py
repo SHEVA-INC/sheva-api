@@ -26,6 +26,8 @@ class BootsViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action == "retrieve":
             return BootsDetailSerializer
+        if self.action == "create":
+            return BootsDetailSerializer
         return BootsSerializer
 
 

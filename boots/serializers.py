@@ -58,7 +58,6 @@ class BootsSerializer(serializers.ModelSerializer):
         sizes_data = validated_data.pop('sizes', None)
         uploaded_images = validated_data.pop("uploaded_images", None)
 
-        # Оновлення основних полів
         instance.name = validated_data.get('name', instance.name)
         instance.price = validated_data.get('price', instance.price)
         instance.color = validated_data.get('color', instance.color)
