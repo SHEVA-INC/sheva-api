@@ -38,3 +38,5 @@ class UserManager(BaseUserManager):
 
 class User(AbstractUser):
     profile_picture = models.ImageField(upload_to='profile_pictures/', null=True, blank=True)
+    phone_number = models.CharField(max_length=15, null=True, blank=True)
+    middle_name = models.CharField(max_length=30, null=True, blank=True)
