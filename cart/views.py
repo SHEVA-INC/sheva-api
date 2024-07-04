@@ -21,6 +21,9 @@ def get_cart(request):
 
     cart_products = cart.cartproduct_set.all()
 
+    def get_subtotal(item):
+        return item.subtotal()
+
     paginator = CustomPageNumberPagination()
     page = paginator.paginate_queryset(cart_products, request)
     if page is not None:
@@ -28,13 +31,15 @@ def get_cart(request):
         response_data = {
             'current_page': paginator.page.number,
             'total_pages': paginator.page.paginator.num_pages,
-            'results': serializer.data
+            'results': serializer.data,
+            'total_price': sum(get_subtotal(item) for item in cart_products)
         }
-        return paginator.get_paginated_response(response_data['results'])
+        return paginator.get_paginated_response(response_data)
 
     serializer = CartProductSerializer(cart_products, many=True, context={'request': request})
     response_data = {
-        'results': serializer.data
+        'results': serializer.data,
+        'total_price': sum(get_subtotal(item) for item in cart_products)
     }
     return Response(response_data)
 
@@ -60,6 +65,21 @@ def add_to_cart(request, product_id, quantity, size):
     if CartProduct.objects.filter(cart=cart, product=product, size=size).exists():
         return Response({"message": "Product already in cart"}, status=status.HTTP_400_BAD_REQUEST)
 
-    cart_product = CartProduct.objects.create(cart=cart, product=product, size=size, quantity=quantity)
-    serializer = CartProductSerializer(cart_product)
-    return Response(serializer.data, status=status.HTTP_201_CREATED)
+    CartProduct.objects.create(cart=cart, product=product, size=size, quantity=quantity)
+    return Response({
+        "message": "Product added to cart successfully",
+    }, status=status.HTTP_201_CREATED)
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def remove_from_cart(request, cart_product_id):
+    user = request.user
+
+    try:
+        cart_product = CartProduct.objects.get(id=cart_product_id, cart__user=user)
+    except CartProduct.DoesNotExist:
+        return Response({'error': 'Product not found in cart'}, status=status.HTTP_404_NOT_FOUND)
+
+    cart_product.delete()
+    return Response({'message': 'Product removed from cart'}, status=status.HTTP_200_OK)

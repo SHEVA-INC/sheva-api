@@ -22,10 +22,11 @@ class CartProductSerializer(serializers.ModelSerializer):
 
 class CartSerializer(serializers.ModelSerializer):
     cartproduct_set = CartProductSerializer(many=True, read_only=True)
+    total_price = serializers.SerializerMethodField()
 
     class Meta:
         model = Cart
         fields = ['cartproduct_set', 'total_price']
 
-    def get_total_price(self, cart):
-        return cart.total_price()
+    def get_total_price(self, obj):
+        return sum(item.subtotal for item in obj.cartproduct_set.all())

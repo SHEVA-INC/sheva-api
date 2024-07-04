@@ -24,6 +24,8 @@ class BootsImageSerializer(serializers.ModelSerializer):
 
     def get_image_url(self, obj):
         request = self.context.get('request')
+        if request is None:
+            return None
         return build_absolute_uri(request, obj.image.url)
 
 
