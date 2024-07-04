@@ -1,7 +1,6 @@
 import requests
 from prettytable import PrettyTable
 
-
 def send_telegram_message(order):
     token = '7061091963:AAG2n-lZo-mpkhWu41-oD6mPv-SZP1tSraw'
     chat_id = '586493494'
@@ -27,7 +26,9 @@ def send_telegram_message(order):
     cart_table.field_names = ["Назва", "Розмір", "Кількість"]
     for cart_product in order.cart.cartproduct_set.all():
         product = cart_product.product
-        cart_table.add_row([product.name, product.size, cart_product.quantity])
+        sizes = product.sizes.all()
+        for size in sizes:
+            cart_table.add_row([product.name, size.size, cart_product.quantity])
 
     text = (
         f"<b>Деталі замовлення:</b>\n<pre>{info_table.get_string()}</pre>\n"
