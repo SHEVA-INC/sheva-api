@@ -29,6 +29,7 @@ def get_cart(request):
     if page is not None:
         serializer = CartProductSerializer(page, many=True, context={'request': request})
         response_data = {
+            'cart_id': cart.id,
             'current_page': paginator.page.number,
             'total_pages': paginator.page.paginator.num_pages,
             'results': serializer.data,
@@ -38,6 +39,7 @@ def get_cart(request):
 
     serializer = CartProductSerializer(cart_products, many=True, context={'request': request})
     response_data = {
+        'cart_id': cart.id,
         'results': serializer.data,
         'total_price': sum(get_subtotal(item) for item in cart_products)
     }

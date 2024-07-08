@@ -17,7 +17,7 @@ def send_telegram_message(order):
         ("Номер відділення", order.post_office_number),
         ("Спосіб доставки", order.delivery_method),
         ("Дата створення", order.created_at.strftime('%Y-%m-%d %H:%M')),
-        ("Сума", order.total_price())
+        ("Сума", order.total_price)
     ]
     for field, data in info_fields:
         info_table.add_row([field, data])

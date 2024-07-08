@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from boots.serializers import BootsSerializer, BootsCartSerializer
+from boots.serializers import BootsCartSerializer
 from .models import Cart, CartProduct
 
 
@@ -26,7 +26,7 @@ class CartSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Cart
-        fields = ['cartproduct_set', 'total_price']
+        fields = ['id', 'cartproduct_set', 'total_price']
 
     def get_total_price(self, obj):
         return sum(item.subtotal for item in obj.cartproduct_set.all())

@@ -16,11 +16,8 @@ class Order(models.Model):
     city_town = models.CharField(max_length=255)
     post_office_number = models.IntegerField()
     delivery_method = models.CharField(max_length=255, choices=DELIVERY_CHOICES)
-
+    total_price = models.DecimalField(max_digits=10, decimal_places=2)
     created_at = models.DateTimeField(auto_now_add=True)
-
-    def total_price(self):
-        return self.cart.total_price()
 
     def __str__(self):
         return f'Order {self.id} - Cart {self.cart.id}'
