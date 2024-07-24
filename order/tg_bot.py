@@ -1,9 +1,11 @@
+import os
+
 import requests
 from prettytable import PrettyTable
 
 def send_telegram_message(order):
-    token = '7061091963:AAG2n-lZo-mpkhWu41-oD6mPv-SZP1tSraw'
-    chat_id = '586493494'
+    token = os.environ.get("TELEGRAM_BOT_TOKEN")
+    chat_id = os.environ.get("TELEGRAM_CHAT_ID")
 
     info_table = PrettyTable()
     info_table.field_names = ["Поле", "Дані"]
