@@ -100,6 +100,8 @@ class BootsDetailSerializer(serializers.ModelSerializer):
             "description",
             "price",
             "color",
+            "new",
+            "popular",
             "sizes",
             "brand",
             "images",
