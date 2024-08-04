@@ -17,7 +17,7 @@ def send_telegram_message(order):
         ("Регіон", order.region),
         ("Місто/Село", order.city_town),
         ("Номер відділення", order.post_office_number),
-        ("Спосіб доставки", order.delivery_method),
+        ("Спосіб доставки", order.payment_method),
         ("Дата створення", order.created_at.strftime('%Y-%m-%d %H:%M')),
         ("Сума", order.total_price)
     ]
