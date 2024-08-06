@@ -185,7 +185,3 @@ SIMPLE_JWT = {
 }
 
 CORS_ORIGIN_ALLOW_ALL = True
-CORS_ORIGIN_WHITELIST = [
-    'http://localhost:5173',
-    os.environ.get("CORS_ORIGIN"),
-]
