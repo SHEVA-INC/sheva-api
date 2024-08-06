@@ -1,9 +1,10 @@
-from rest_framework import viewsets, permissions, generics, status
+from django.shortcuts import get_object_or_404
+from rest_framework import permissions, generics, status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from review.models import Review
-from review.permissions import IsOwnerOrReadOnly
 from review.serializers import ReviewSerializer
 
 
@@ -36,3 +37,12 @@ class ReviewDeleteView(generics.DestroyAPIView):
         if review.user != request.user:
             return Response({"error": "Ви не можете видалити цей відгук"}, status=status.HTTP_403_FORBIDDEN)
         return super().delete(request, *args, **kwargs)
+
+
+class DeleteReviewView(APIView):
+    permission_classes = [permissions.IsAdminUser]
+
+    def delete(self, request, review_id):
+        review = get_object_or_404(Review, id=review_id)
+        review.delete()
+        return Response({'message': 'Review deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
