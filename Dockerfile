@@ -26,9 +26,12 @@ COPY --from=build /opt/venv /opt/venv
 COPY . .
 
 RUN addgroup --system --gid 1001 django && \
-    adduser --system --uid 1001 django
+    adduser --system --uid 1001 django && \
+    mkdir -p /app/media/uploads && \
+    chmod -R 755 /app && \
+    chmod -R 777 /app/media/uploads
 
-RUN chown -R django:django ./ && \
+RUN chown -R django:django /app && \
     chmod +x entrypoint.sh
 
 USER django
