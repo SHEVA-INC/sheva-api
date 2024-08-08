@@ -5,7 +5,7 @@ from cart.models import Cart
 class Order(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
     full_name = models.CharField(max_length=255)
-    phone_number = models.IntegerField()
+    phone_number = models.CharField(max_length=255)
     email = models.EmailField()
     region = models.CharField(max_length=255)
     city_town = models.CharField(max_length=255)
