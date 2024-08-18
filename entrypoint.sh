@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 export SUPERUSER_NAME
 export SUPERUSER_EMAIL
