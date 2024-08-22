@@ -139,7 +139,7 @@
 **/*.dump
 
 # Docker
-**/Dockerfile
+**/Dockerfile*
 **/docker-compose.yml
 
 # Git
@@ -150,3 +150,4 @@
 **/*.swp
 **/*.swo
 **/*~
+**/*.secrets
