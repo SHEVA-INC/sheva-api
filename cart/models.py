@@ -16,6 +16,9 @@ class Cart(models.Model):
             total += cart_product.quantity * cart_product.product.price
         return total
 
+    def clear(self):
+        self.products.clear()
+
     def __str__(self):
         products_details = []
         for cart_product in self.cartproduct_set.all():
