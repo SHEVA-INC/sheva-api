@@ -1,5 +1,4 @@
 import os
-
 import requests
 from prettytable import PrettyTable
 
@@ -26,11 +25,14 @@ def send_telegram_message(order):
 
     cart_table = PrettyTable()
     cart_table.field_names = ["Назва", "Розмір", "Кількість"]
-    for cart_product in order.cart.cartproduct_set.all():
-        product = cart_product.product
-        sizes = product.sizes.all()
-        for size in sizes:
-            cart_table.add_row([product.name, size.size, cart_product.quantity])
+
+    cart_products = order.cart.cartproduct_set.all()
+
+    for cart_product in cart_products:
+        product_name = cart_product.product.name
+        size = cart_product.size
+        quantity = cart_product.quantity
+        cart_table.add_row([product_name, size, quantity])
 
     text = (
         f"<b>Деталі замовлення:</b>\n<pre>{info_table.get_string()}</pre>\n"
@@ -40,4 +42,5 @@ def send_telegram_message(order):
     url = f'https://api.telegram.org/bot{token}/sendMessage'
     data = {'chat_id': chat_id, 'text': text, 'parse_mode': 'HTML'}
     response = requests.post(url, data=data)
+
     return response.json()
