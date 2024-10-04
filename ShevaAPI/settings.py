@@ -140,16 +140,8 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
-    'DEFAULT_THROTTLE_CLASSES': [
-        'rest_framework.throttling.AnonRateThrottle',
-        'rest_framework.throttling.UserRateThrottle'
-    ],
     'DEFAULT_PAGINATION_CLASS': 'boots.filters.CustomPageNumberPagination',
     'PAGE_SIZE': 5,
-    'DEFAULT_THROTTLE_RATES': {
-        'anon': '150/day',
-        'user': '1000/day'
-    },
     'DEFAULT_PARSER_CLASSES': [
         'rest_framework.parsers.JSONParser',
         'rest_framework.parsers.MultiPartParser',
