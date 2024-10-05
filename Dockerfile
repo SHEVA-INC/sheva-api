@@ -1,4 +1,4 @@
-FROM python:3.11-alpine@sha256:4350f4caccd5f014eb107fd0c7348f428d6e9d9fb089797d6264a234592e0981 as build
+FROM python:3.11-alpine@sha256:4350f4caccd5f014eb107fd0c7348f428d6e9d9fb089797d6264a234592e0981 AS build
 
 WORKDIR /app
 
