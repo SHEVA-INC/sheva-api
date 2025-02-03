@@ -1,34 +1,47 @@
 from rest_framework import serializers
+from boots.models import Boots
+from accessories.models import Accessory
+from cart.models import CartItem, Cart
 
-from boots.serializers import BootsCartSerializer
-from .models import Cart, CartProduct
 
-
-class CartProductSerializer(serializers.ModelSerializer):
-    product = BootsCartSerializer()
-    cart_product_id = serializers.IntegerField(source='pk', read_only=True)
+class CartItemSerializer(serializers.ModelSerializer):
+    product_type = serializers.SerializerMethodField()
+    product_data = serializers.SerializerMethodField()
 
     class Meta:
-        model = CartProduct
-        fields = ['cart_product_id', 'product', 'size', 'quantity', 'subtotal']
+        model = CartItem
+        fields = ['id', 'product_type', 'product_data', 'quantity', 'size', 'subtotal']
 
-    def to_representation(self, instance):
-        representation = super().to_representation(instance)
-        product_representation = representation.pop('product')
-        product_representation['cart_product_id'] = representation['cart_product_id']
-        product_representation['quantity'] = representation['quantity']
-        product_representation['subtotal'] = representation['subtotal']
-        product_representation['size'] = instance.size
-        return product_representation
+    def get_product_type(self, obj):
+        return obj.content_type.model
+
+    def get_product_data(self, obj):
+        if isinstance(obj.content_object, Boots):
+            return {
+                'id': obj.content_object.id,
+                'name': obj.content_object.name,
+                'price': obj.content_object.price,
+                'brand': obj.content_object.brand,
+                'color': obj.content_object.color,
+                'main_image': self.context['request'].build_absolute_uri(
+                    obj.content_object.main_image.url) if obj.content_object.main_image else None,
+            }
+        elif isinstance(obj.content_object, Accessory):
+            return {
+                'id': obj.content_object.id,
+                'name': obj.content_object.name,
+                'price': obj.content_object.price,
+                'size': obj.content_object.size,
+                'type': obj.content_object.type,
+                'main_image': self.context['request'].build_absolute_uri(
+                    obj.content_object.main_image.url) if obj.content_object.main_image else None,
+            }
 
 
 class CartSerializer(serializers.ModelSerializer):
-    cartproduct_set = CartProductSerializer(many=True, read_only=True)
-    total_price = serializers.SerializerMethodField()
+    items = CartItemSerializer(source='cartitems', many=True, read_only=True)
+    total_price = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
 
     class Meta:
         model = Cart
-        fields = ['id', 'cartproduct_set', 'total_price']
-
-    def get_total_price(self, obj):
-        return sum(item.subtotal for item in obj.cartproduct_set.all())
+        fields = ['id', 'items', 'total_price']
