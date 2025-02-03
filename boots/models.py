@@ -56,9 +56,9 @@ class Boots(models.Model):
 class Size(models.Model):
     boots = models.ForeignKey(Boots, related_name='sizes', on_delete=models.CASCADE)
     size = models.PositiveIntegerField(validators=[
-        MinValueValidator(35),
+        MinValueValidator(30),
         MaxValueValidator(45)
-    ], help_text='Choose a size between 35 and 45')
+    ], help_text='Choose a size between 30 and 45')
     stock = models.PositiveIntegerField(help_text="Stock available for this size")
 
     def __str__(self):
