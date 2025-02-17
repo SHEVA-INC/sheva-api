@@ -2,9 +2,13 @@ import os
 import requests
 from prettytable import PrettyTable
 
+
 def send_telegram_message(order):
     token = os.environ.get("TELEGRAM_BOT_TOKEN")
     chat_id = os.environ.get("TELEGRAM_CHAT_ID")
+
+    if not token or not chat_id:
+        return {"error": "Telegram bot token or chat ID not set"}
 
     info_table = PrettyTable()
     info_table.field_names = ["Поле", "Дані"]
@@ -18,21 +22,19 @@ def send_telegram_message(order):
         ("Номер відділення", order.post_office_number),
         ("Спосіб доставки", order.payment_method),
         ("Дата створення", order.created_at.strftime('%Y-%m-%d %H:%M')),
-        ("Сума", order.total_price)
+        ("Сума", order.cart.total_price())
     ]
+
     for field, data in info_fields:
         info_table.add_row([field, data])
 
     cart_table = PrettyTable()
-    cart_table.field_names = ["Назва", "Розмір", "Кількість"]
+    cart_table.field_names = ["Назва", "Розмір", "Кількість", "Ціна"]
 
-    cart_products = order.cart.cartproduct_set.all()
-
-    for cart_product in cart_products:
-        product_name = cart_product.product.name
-        size = cart_product.size
-        quantity = cart_product.quantity
-        cart_table.add_row([product_name, size, quantity])
+    for cart_item in order.cart.cartitems.all():
+        product = cart_item.content_object
+        size = cart_item.size if cart_item.size else "N/A"
+        cart_table.add_row([product.name, size, cart_item.quantity, f"{product.price}₴"])
 
     text = (
         f"<b>Деталі замовлення:</b>\n<pre>{info_table.get_string()}</pre>\n"
@@ -41,6 +43,6 @@ def send_telegram_message(order):
 
     url = f'https://api.telegram.org/bot{token}/sendMessage'
     data = {'chat_id': chat_id, 'text': text, 'parse_mode': 'HTML'}
-    response = requests.post(url, data=data)
 
+    response = requests.post(url, data=data)
     return response.json()
