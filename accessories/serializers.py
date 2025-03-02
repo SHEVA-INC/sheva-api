@@ -18,7 +18,7 @@ class AccessoriesSerializer(serializers.ModelSerializer):
 class AccessoriesListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Accessory
-        fields = ["id", "name", "price", "main_image", "type"]
+        fields = ["id", "name", "price", "main_image", "type", "size"]
 
 
 class IdsSerializer(serializers.Serializer):
