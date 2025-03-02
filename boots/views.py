@@ -7,6 +7,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django_filters.rest_framework import DjangoFilterBackend
 
+from accessories.models import Accessory
+from accessories.serializers import LikedAccessorySerializer
 from boots.filters import BootsFilter, CustomPageNumberPagination
 from boots.models import Boots
 from boots.permissions import IsAdminOrReadOnly
@@ -49,27 +51,46 @@ class PopularBootsList(APIView):
         return Response(serializer.data)
 
 
-class GetBootsByIdsView(APIView):
-    queryset = Boots.objects.all().order_by('id')
+class GetItemsByIdsView(APIView):
     permission_classes = [IsAuthenticated]
     serializer_class = IdsSerializer
     pagination_class = CustomPageNumberPagination
 
+    MODEL_SERIALIZER_MAP = {
+        'accessories': (Accessory, LikedAccessorySerializer),
+        'boots': (Boots, LikedBootsSerializer),
+    }
+
     def post(self, request):
-        serializer = IdsSerializer(data=request.data)
-        if serializer.is_valid():
-            ids = serializer.validated_data['ids']
-            boots = Boots.objects.filter(id__in=ids)
+        categories_data = request.data.get('categories', {})
+        if not isinstance(categories_data, dict):
+            return Response({'error': 'Invalid categories format'},
+                            status=status.HTTP_400_BAD_REQUEST)
 
-            paginator = CustomPageNumberPagination()
-            page = paginator.paginate_queryset(boots, request)
-            if page is not None:
-                boots_serializer = LikedBootsSerializer(page, many=True, context={'request': request})
-                return paginator.get_paginated_response(boots_serializer.data)
+        response_data = {}
+        paginator = CustomPageNumberPagination()
 
-            boots_serializer = LikedBootsSerializer(boots, many=True, context={'request': request})
-            return Response(boots_serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        all_items = []
+        for category, ids in categories_data.items():
+            if category not in self.MODEL_SERIALIZER_MAP:
+                return Response({'error': f'Invalid category: {category}'},
+                                status=status.HTTP_400_BAD_REQUEST)
+
+            model, serializer_class = self.MODEL_SERIALIZER_MAP[category]
+            items = list(model.objects.filter(id__in=ids).order_by('id'))
+            items_serializer = serializer_class(items, many=True,
+                                                context={'request': request})
+            response_data[category] = items_serializer.data
+            all_items.extend(items)
+
+        all_items.sort(key=lambda x: x.id)
+        page = paginator.paginate_queryset(all_items, request)
+        if page is not None:
+            paginated_response = paginator.get_paginated_response(response_data)
+            return paginated_response
+
+        return Response(response_data, status=status.HTTP_200_OK)
+
 
 
 class BootsUpdateView(generics.UpdateAPIView):

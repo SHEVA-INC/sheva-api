@@ -24,26 +24,3 @@ class AccessoriesViewSet(viewsets.ModelViewSet):
         if self.action in ["retrieve", "create"]:
             return AccessoriesSerializer
         return AccessoriesListSerializer
-
-
-class GetAccessoriesByIdsView(APIView):
-    queryset = Accessory.objects.all().order_by('id')
-    permission_classes = [IsAuthenticated]
-    serializer_class = IdsSerializer
-    pagination_class = CustomPageNumberPagination
-
-    def post(self, request):
-        serializer = IdsSerializer(data=request.data)
-        if serializer.is_valid():
-            ids = serializer.validated_data['ids']
-            accessories = Accessory.objects.filter(id__in=ids)
-
-            paginator = CustomPageNumberPagination()
-            page = paginator.paginate_queryset(accessories, request)
-            if page is not None:
-                accessories_serializer = LikedAccessorySerializer(page, many=True, context={'request': request})
-                return paginator.get_paginated_response(accessories_serializer.data)
-
-            accessories_serializer = LikedAccessorySerializer(accessories, many=True, context={'request': request})
-            return Response(accessories_serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
