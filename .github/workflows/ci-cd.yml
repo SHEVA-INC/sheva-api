@@ -1,8 +1,4 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-# More info on Python, GitHub Actions, and Azure App Service: https://aka.ms/python-webapps-actions
-
-name: Build and deploy Python app to Azure Web App - back-end
+name: Build and Deploy Sheva Shop API
 
 on:
   push:
@@ -13,12 +9,11 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
 
       - name: Set up Python version
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v5
         with:
           python-version: '3.12'
 
@@ -35,9 +30,9 @@ jobs:
         run: zip release.zip ./* -r
 
       - name: Upload artifact for deployment jobs
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: python-app
+          name: app-sheva-shop
           path: |
             release.zip
             !venv/
@@ -50,18 +45,23 @@ jobs:
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
     steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v3
+      - uses: azure/login@v2
         with:
-          name: python-app
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v4
+        with:
+          name: app-sheva-shop
 
       - name: Unzip artifact for deployment
         run: unzip release.zip
 
-      - name: 'Deploy to Azure Web App'
-        uses: azure/webapps-deploy@v2
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v3
         id: deploy-to-webapp
         with:
-          app-name: 'back-end'
-          slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_690F4F5BC44D45669CA0D0920B87E5A6 }}
+          app-name: 'app-sheva-shop'
+      
+      - run: |
+          az logout
